@@ -36,3 +36,22 @@ def get_all_task(db:Session = Depends(get_db)):
     for row in task:
         return task
     
+@app.patch("/tasks/{task_id}", response_model=ResponseTask)
+def update_task(task_id:int, db:Session=Depends(get_db)):
+    task = (db.query(Task).filter(Task.id==task_id).first())
+    if not task :
+        raise HTTPException(status_code=404, detail="Task not found")
+    task.done = True
+    db.commit()
+    db.refresh(task)
+    return task
+
+# @app.delete("/tasks/{task_id}", response_model=ResponseTask)
+# def delete_task(task_id:int , db: Session=Depends(get_db)):
+#     task = (db.query(Task).filter(Task.id==task_id).first())
+#     if not task :
+#         raise HTTPException(status_code=404, detail="Task not found")
+#     db.delete(task)
+#     db.commit()
+#     db.refresh(task)
+#     return {"Message":"Task Deleted"}
