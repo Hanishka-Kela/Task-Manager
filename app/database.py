@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-DATABASE_URL = "sqlite///./tasks.db"
+DATABASE_URL = "sqlite:///./tasks.db"
 
 engine = create_engine(DATABASE_URL,
-                       connect_args={"check same thread":False})
+                       connect_args={"check_same_thread":False}
+                       )
 
 SessionLocal = sessionmaker(autoflush=False,
                             autocommit=False,

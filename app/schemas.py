@@ -10,7 +10,7 @@ class Priority(str, Enum):
 class CreateTask(BaseModel):
     title:str
     priority:Priority
-    due_date:str
+    due_date:date
     
 class ResponseTask(BaseModel):
     id: int
