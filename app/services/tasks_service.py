@@ -21,12 +21,12 @@ class TasksService:
         return TasksRepository.create(db, data_map)
 
     @staticmethod
-    def mark_task_as_done(db: Session, task_id: int):
+    def update_task_status(db: Session, task_id: int, new_status: str ):
         task = TasksRepository.get_by_id(db, task_id)
         if not task:
             raise HTTPException(status_code=404, detail="Task not found")
         
-        task.done = True
+        task.status = new_status
         return TasksRepository.save_changes(db, task)
 
     @staticmethod

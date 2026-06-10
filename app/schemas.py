@@ -11,13 +11,18 @@ class CreateTask(BaseModel):
     title:str
     priority:Priority
     due_date:date
+
+class Status(str, Enum):
+    to_do ="Pending"
+    in_progress="In-progress"
+    done = "completed"
     
 class ResponseTask(BaseModel):
     id: int
     title:str
     priority:Priority
     due_date:date
-    done:bool
+    status:str
 
     class Config:
         from_attributes = True

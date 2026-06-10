@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,Integer,Boolean,Date
+from sqlalchemy import Column,String,Integer,Date
 from app.database import Base
 
 
@@ -8,5 +8,5 @@ class Task(Base):
     title = Column(String, nullable=False)
     priority = Column(String, nullable=False)
     due_date = Column(Date)
-    done=Column(Boolean, default=False)
+    status=Column(String,default="Pending")
 

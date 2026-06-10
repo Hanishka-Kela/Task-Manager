@@ -12,7 +12,7 @@ router = APIRouter(
     tags=["Tasks"]
 )
 
-@router.post("", response_model=ResponseTask, status_code=21)
+@router.post("", response_model=ResponseTask, status_code=201)
 def create_task(task_data: CreateTask, db: Session = Depends(get_db)):
     return TasksService.create_task(db, task_data)
 
@@ -25,8 +25,8 @@ def get_task_by_id(task_id: int, db: Session = Depends(get_db)):
     return TasksService.get_task_by_id(db, task_id)
 
 @router.patch("/{task_id}", response_model=ResponseTask)
-def mark_task_as_done(task_id: int, db: Session = Depends(get_db)):
-    return TasksService.mark_task_as_done(db, task_id)
+def update_task_status(task_id: int, new_status: str, db: Session = Depends(get_db)):
+    return TasksService.update_task_status(db, task_id, new_status=new_status)
 
 @router.delete("/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
