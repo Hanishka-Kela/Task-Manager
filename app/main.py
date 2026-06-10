@@ -1,56 +1,18 @@
-from fastapi import FastAPI, HTTPException, Depends
-from app.schemas import ResponseTask,CreateTask
-from app.database import engine, Base, SessionLocal, Session,get_db
-from app.models import Task
-from typing import List
+from fastapi import FastAPI
+from app.database import engine, Base
+from app.routers import tasks_router
 
+app = FastAPI(
+    title="Task Manager API",
+    description="A scalable, multi-layered Task Management API",
+    version="1.0.0"
+)
 
-app=FastAPI()
-
+# Automatically create database tables on application startup
 Base.metadata.create_all(engine)
-
 
 @app.get("/")
 def root():
-    return {"Message":"Welcom to Task Manager"}
+    return {"Message": "Welcome to Task Manager"}
 
-@app.post("/task",response_model=ResponseTask)
-def create_task(task:CreateTask, db:Session = Depends(get_db)):
-    new_task = Task(**task.model_dump())
-    db.add(new_task)
-    db.commit()
-    db.refresh(new_task)
-    return new_task
-
-
-@app.get("/tasks/{task_id}",response_model=ResponseTask)
-def get_task(task_id:int, db:Session = Depends(get_db)):
-    task = (db.query(Task).filter(Task.id==task_id).first())
-    if not task:
-        raise HTTPException (status_code=404, detail="Task Not Found")
-    return task
-
-@app.get("/tasks", response_model=List[ResponseTask])
-def get_all_task(db:Session = Depends(get_db)):
-    task = (db.query(Task).all())
-    for row in task:
-        return task
-    
-@app.patch("/tasks/{task_id}", response_model=ResponseTask)
-def update_task(task_id:int, db:Session=Depends(get_db)):
-    task = (db.query(Task).filter(Task.id==task_id).first())
-    if not task :
-        raise HTTPException(status_code=404, detail="Task not found")
-    task.done = True
-    db.commit()
-    db.refresh(task)
-    return task
-
-@app.delete("/tasks/{task_id}")
-def delete_task(task_id:int , db: Session=Depends(get_db)):
-    task = (db.query(Task).filter(Task.id==task_id).first())
-    if not task :
-        raise HTTPException(status_code=404, detail="Task not found")
-    db.delete(task)
-    db.commit()
-    return {"Message":"Task Deleted"}
+app.include_router(tasks_router.router)
