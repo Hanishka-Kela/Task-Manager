@@ -1,30 +1,15 @@
 from sqlalchemy.orm import Session
-from app.models import Task
+from app.models import User
 
-class TasksRepository:
+class UserRepositoy:
     @staticmethod
-    def get_all(db: Session):
-        return db.query(Task).all()
-
-    @staticmethod
-    def get_by_id(db: Session, task_id: int):
-        return db.query(Task).filter(Task.id == task_id).first()
-
-    @staticmethod
-    def create(db: Session, task_data: dict):
-        new_task = Task(**task_data)
-        db.add(new_task)
+    def create_user(db:Session, user_data:dict):
+        new_user = User(**user_data)
+        db.add(new_user)
         db.commit()
-        db.refresh(new_task)
-        return new_task
-
+        db.refresh(new_user)
+        return new_user
+    
     @staticmethod
-    def delete(db: Session, task: Task):
-        db.delete(task)
-        db.commit()
-
-    @staticmethod
-    def save_changes(db: Session, task: Task):
-        db.commit()
-        db.refresh(task)
-        return task
+    def get_user_by_username(db:Session, username:str):
+        return db.query(User).filter(User.username==username).first()

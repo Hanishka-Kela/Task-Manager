@@ -7,22 +7,33 @@ class Priority(str, Enum):
     medium_priority = "medium"
     high_priority = "high"
 
+class Status(str, Enum):
+    to_do ="Pending"
+    in_progress="In-progress"
+    done = "completed"
+
 class CreateTask(BaseModel):
     title:str
     priority:Priority
     due_date:date
 
-class Status(str, Enum):
-    to_do ="Pending"
-    in_progress="In-progress"
-    done = "completed"
-    
 class ResponseTask(BaseModel):
     id: int
     title:str
     priority:Priority
     due_date:date
     status:str
+
+    class Config:
+        from_attributes = True
+
+class UserCreate(BaseModel):
+    username:str
+    password:str
+
+class UserResponse(BaseModel):
+    id:int
+    username:str
 
     class Config:
         from_attributes = True
