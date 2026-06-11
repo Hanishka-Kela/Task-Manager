@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models import User
 
-class UserRepositoy:
+class UserRepository:
     @staticmethod
     def create_user(db:Session, user_data:dict):
         new_user = User(**user_data)
