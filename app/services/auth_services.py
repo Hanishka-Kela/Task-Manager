@@ -1,13 +1,13 @@
 from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import session
-from app.schemas import UserCreate
+from app.schemas import UserCreate, TokenData, Token, UserLogin
 from app. repositories import UserRepository
 from app.core.security import pwd_context,SECRET_KEY,ALGORITHM
 from datetime import timedelta, datetime
 import jwt
 
-class AuthSevice:
+class AuthService:
 
     @staticmethod
     def registerUser(db:session, user: UserCreate):
@@ -18,11 +18,11 @@ class AuthSevice:
         hashed_password = pwd_context.hash(user.password)
         user_dict = user.model_dump()
         user_dict["password"] = hashed_password
-        return UserRepository.UserCreate(db,user_dict)
+        return UserRepository.create_user(db,user_dict)
             
     @staticmethod
     def verify_password(plain_password:str, hashed_password:str) ->bool:
-        return pwd_context.verfy(plain_password, hashed_password)
+        return pwd_context.verify(plain_password, hashed_password)
 
     @staticmethod
     def get_pwd_hash(password:str) ->str:
@@ -40,6 +40,35 @@ class AuthSevice:
         encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm = ALGORITHM )
         return encoded_jwt 
 
-    
+    @staticmethod
+    def verify_token(token :str) -> TokenData :
+        try :
+            payload = jwt.decode(token , SECRET_KEY, algorithms = [ALGORITHM])
+            username:str = payload.get("sub")
+            if username is None:
+                raise HTTPException(status_code=401 , 
+                detail="Could Not verify credentials",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+            return TokenData(username = username)
+        
+        except jwt.PyJWTError:
+            raise HTTPException(status_code = 401,
+            detail = "Could Not verify credentials",
+            headers={"WWW-Authenticate": "Bearer"})
+
+    @staticmethod
+    def loginUser(db:session,user:UserLogin):
+        db_user = UserRepository.get_user_by_username(db,user.username)
+        if not db_user or not pwd_context.verify(user.password,db_user.password):
+            raise HTTPException(status_code = 401, detail = "Invalid Credentials")
+        token_data = {"sub":db_user.username} 
+        access_token = AuthService.create_access_token(data=token_data)
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+              
+
+             
+          
         
             

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 from datetime import date
+from typing import Optional
 
 class Priority(str, Enum):
     low_priority = "low"
@@ -46,3 +47,6 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token :str
     token_type:str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
