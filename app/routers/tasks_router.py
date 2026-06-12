@@ -1,3 +1,5 @@
+from app.core.security import get_current_user
+from app.models import User
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
@@ -13,7 +15,7 @@ router = APIRouter(
 )
 
 @router.post("", response_model=ResponseTask, status_code=201)
-def create_task(task_data: CreateTask, db: Session = Depends(get_db)):
+def create_task(task_data: CreateTask, db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     return TasksService.create_task(db, task_data)
 
 @router.get("", response_model=List[ResponseTask])
