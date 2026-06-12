@@ -1,3 +1,4 @@
+from app import database
 from sqlalchemy.orm import Session
 from app.repositories.tasks_repository import TasksRepository
 from app.schemas import CreateTask
@@ -16,9 +17,10 @@ class TasksService:
         return task
 
     @staticmethod
-    def create_task(db: Session, task_data: CreateTask):
-        data_map = task_data.model_dump() 
-        return TasksRepository.create(db, data_map)
+    def create_task(db: Session, task_data: CreateTask, user_id: int):
+        task_dict = task_data.model_dump()
+        task_dict["owner_id"] = user_id
+        return TasksRepository.create(db, task_dict)
 
     @staticmethod
     def update_task_status(db: Session, task_id: int, new_status: str ):
