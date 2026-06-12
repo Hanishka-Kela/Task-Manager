@@ -8,6 +8,7 @@ TOKEN_EXPIRES = 30
 pwd_context = CryptContext(schemes=['bcrypt'], 
                            deprecated = "auto")
 
-OAuth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+OAuth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
 
     

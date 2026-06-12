@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import session
 from app.schemas import UserCreate, TokenData, Token, UserLogin
-from app. repositories import UserRepository
+from app.repositories.user_repository import UserRepository
 from app.core.security import pwd_context,SECRET_KEY,ALGORITHM
 from datetime import timedelta, datetime
 import jwt
@@ -65,10 +65,3 @@ class AuthService:
         token_data = {"sub":db_user.username} 
         access_token = AuthService.create_access_token(data=token_data)
         return {"access_token": access_token, "token_type": "bearer"}
-        
-              
-
-             
-          
-        
-            

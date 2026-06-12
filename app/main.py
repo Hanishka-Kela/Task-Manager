@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.routers import tasks_router
+from app.routers import tasks_router,auth_router
 
 app = FastAPI(
     title="Task Manager API",
@@ -16,3 +16,4 @@ def root():
     return {"Message": "Welcome to Task Manager"}
 
 app.include_router(tasks_router.router)
+app.include_router(auth_router.router_user)
