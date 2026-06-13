@@ -1,0 +1,5 @@
+# Pyrefly type checker configuration
+# Points to the project's virtual environment so app.* imports resolve correctly
+
+python-interpreter-path = ".venv/bin/python"
+search_path = ["."]
