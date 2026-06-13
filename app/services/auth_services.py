@@ -1,16 +1,16 @@
 from typing import Optional
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import session
+from sqlalchemy.orm import Session
 from app.schemas import UserCreate, UserRegister, TokenData, Token, UserLogin
 from app.repositories.user_repository import UserRepository
 from app.core.security import pwd_context,SECRET_KEY,ALGORITHM
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 import jwt
 
 class AuthService:
 
     @staticmethod
-    def registerUser(db:session, user: UserRegister):
+    def registerUser(db: Session, user: UserRegister):
         user_in_db = UserRepository.get_user_by_username(db,user.username)
         if user_in_db:
             raise HTTPException(status_code = 400, detail = "User already Exists")
@@ -31,9 +31,9 @@ class AuthService:
     def create_access_token(data:dict, expires_delta: Optional[timedelta] = None) ->str:
         to_encode = data.copy()
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() +timedelta(minutes=30)
+            expire = datetime.now(timezone.utc) + timedelta(minutes=30)
         
         to_encode.update({"exp":expire})
         encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm = ALGORITHM )
@@ -57,7 +57,7 @@ class AuthService:
             headers={"WWW-Authenticate": "Bearer"})
 
     @staticmethod
-    def loginUser(db:session,user:UserLogin):
+    def loginUser(db: Session, user: UserLogin):
         db_user = UserRepository.get_user_by_username(db,user.username)
         if not db_user or not pwd_context.verify(user.password, db_user.hashed_password):
             raise HTTPException(status_code = 401, detail = "Invalid Credentials")

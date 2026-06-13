@@ -13,3 +13,6 @@ wheels/
 .env
 
 .lock
+
+# SQLite database
+*.db
