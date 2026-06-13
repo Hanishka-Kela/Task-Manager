@@ -17,7 +17,8 @@ class AuthService:
 
         hashed_password = pwd_context.hash(user.password)
         user_dict = user.model_dump()
-        user_dict["password"] = hashed_password
+        user_dict["hashed_password"] = hashed_password
+        del user_dict["password"]
         return UserRepository.create_user(db,user_dict)
             
     @staticmethod

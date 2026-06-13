@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.schemas import UserCreate, UserLogin, Token
+from app.schemas import UserCreate, UserLogin, Token, UserResponse
 # pyrefly: ignore [missing-import]
 from app.services.auth_services import AuthService
 from app.database import get_db
@@ -8,7 +8,7 @@ router_user = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
-@router_user.post("/signup", response_model=UserCreate,status_code=201)
+@router_user.post("/signup", response_model=UserResponse, status_code=201)
 def create_user(user_data: UserCreate,db:Session = Depends(get_db)):
     return AuthService.registerUser(db,user_data)
 
