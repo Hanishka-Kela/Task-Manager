@@ -15,7 +15,7 @@ class AuthService:
         if user_in_db:
             raise HTTPException(status_code = 400, detail = "User already Exists")
 
-        hashed_password = pwd_context.hash(user.password)
+        hashed_password = pwd_context.hash(user.password.encode("utf-8")[:72])
         user_dict = user.model_dump()
         user_dict["hashed_password"] = hashed_password
         del user_dict["password"]
@@ -61,7 +61,8 @@ class AuthService:
     @staticmethod
     def loginUser(db:session,user:UserLogin):
         db_user = UserRepository.get_user_by_username(db,user.username)
-        if not db_user or not pwd_context.verify(user.password,db_user.password):
+        truncated = user.password.encode("utf-8")[:72]
+        if not db_user or not pwd_context.verify(truncated, db_user.hashed_password):
             raise HTTPException(status_code = 401, detail = "Invalid Credentials")
         token_data = {"sub":db_user.username} 
         access_token = AuthService.create_access_token(data=token_data)
