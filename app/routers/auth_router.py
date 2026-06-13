@@ -14,7 +14,13 @@ def create_user(user_data: UserRegister, db:Session = Depends(get_db)):
     return AuthService.registerUser(db,user_data)
 
 @router_user.post("/login", response_model=Token, status_code=200)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(user: UserLogin, db: Session = Depends(get_db)):
+    """Login with JSON body — for API clients (Postman, curl, etc.)"""
+    return AuthService.loginUser(db, user)
+
+@router_user.post("/token", response_model=Token, status_code=200)
+def token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login with form data — used by Swagger Authorize button."""
     user = UserLogin(username=form_data.username, password=form_data.password)
     return AuthService.loginUser(db, user)
 
