@@ -3,8 +3,8 @@ from app.models import Task
 
 class TasksRepository:
     @staticmethod
-    def get_all(db: Session):
-        return db.query(Task).all()
+    def get_all(db: Session, user_id: int):
+        return db.query(Task).filter(Task.owner_id == user_id).all()
 
     @staticmethod
     def get_by_id(db: Session, task_id: int):

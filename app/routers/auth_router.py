@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.schemas import UserCreate, UserRegister, UserLogin, Token, UserResponse
 # pyrefly: ignore [missing-import]
@@ -12,8 +13,9 @@ router_user = APIRouter(
 def create_user(user_data: UserRegister, db:Session = Depends(get_db)):
     return AuthService.registerUser(db,user_data)
 
-@router_user.post("/login", response_model=Token, status_code =200)
-def login(user:UserLogin, db: Session = Depends(get_db)):
-    return AuthService.loginUser(db , user)
+@router_user.post("/login", response_model=Token, status_code=200)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = UserLogin(username=form_data.username, password=form_data.password)
+    return AuthService.loginUser(db, user)
 
 

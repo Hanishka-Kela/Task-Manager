@@ -43,7 +43,7 @@ class AuthService:
     def verify_token(token :str) -> TokenData :
         try :
             payload = jwt.decode(token , SECRET_KEY, algorithms = [ALGORITHM])
-            username:str = payload.get("sub")
+            username: str | None = payload.get("sub")
             if username is None:
                 raise HTTPException(status_code=401 , 
                 detail="Could Not verify credentials",
