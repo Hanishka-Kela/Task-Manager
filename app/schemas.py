@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from enum import Enum
 from datetime import date
 from typing import Optional
@@ -27,6 +27,17 @@ class ResponseTask(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    confirm_password: str
+
+    @model_validator(mode="after")
+    def passwords_match(self):
+        if self.password != self.confirm_password:
+            raise ValueError("Passwords do not match")
+        return self
 
 class UserCreate(BaseModel):
     username:str

@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import session
-from app.schemas import UserCreate, TokenData, Token, UserLogin
+from app.schemas import UserCreate, UserRegister, TokenData, Token, UserLogin
 from app.repositories.user_repository import UserRepository
 from app.core.security import pwd_context,SECRET_KEY,ALGORITHM
 from datetime import timedelta, datetime
@@ -10,15 +10,13 @@ import jwt
 class AuthService:
 
     @staticmethod
-    def registerUser(db:session, user: UserCreate):
+    def registerUser(db:session, user: UserRegister):
         user_in_db = UserRepository.get_user_by_username(db,user.username)
         if user_in_db:
             raise HTTPException(status_code = 400, detail = "User already Exists")
 
-        hashed_password = pwd_context.hash(user.password.encode("utf-8")[:72])
-        user_dict = user.model_dump()
-        user_dict["hashed_password"] = hashed_password
-        del user_dict["password"]
+        hashed_password = pwd_context.hash(user.password)
+        user_dict = {"username": user.username, "hashed_password": hashed_password}
         return UserRepository.create_user(db,user_dict)
             
     @staticmethod
@@ -61,8 +59,7 @@ class AuthService:
     @staticmethod
     def loginUser(db:session,user:UserLogin):
         db_user = UserRepository.get_user_by_username(db,user.username)
-        truncated = user.password.encode("utf-8")[:72]
-        if not db_user or not pwd_context.verify(truncated, db_user.hashed_password):
+        if not db_user or not pwd_context.verify(user.password, db_user.hashed_password):
             raise HTTPException(status_code = 401, detail = "Invalid Credentials")
         token_data = {"sub":db_user.username} 
         access_token = AuthService.create_access_token(data=token_data)
